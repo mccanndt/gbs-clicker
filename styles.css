@@ -27,6 +27,7 @@ body {
 
 .container {
   width: 450px;
+  height: 100px;
   margin: auto;
 }
 
