@@ -41,6 +41,8 @@ function updateDisplay() {
   gameData.playerAttack = roundToTwoDecimals(gameData.playerAttack);
   gameData.playerDefense = roundToTwoDecimals(gameData.playerDefense);
   enemyCurrentHealth = roundToTwoDecimals(enemyCurrentHealth);
+  enemyAttack = roundToTwoDecimals(enemyAttack);
+  enemyDefense = roundToTwoDecimals(enemyDefense);
 
   // Progress Bar
   var elem = document.getElementById("healthBar");
@@ -116,7 +118,7 @@ function attack() {
     if (enemyAttack > gameData.playerDefense) {
       var amount = enemyAttack - gameData.playerDefense;
       gameData.currentHealth -= amount;
-      gameData.playerDefense += enemyAttack * 0.01;
+      gameData.playerDefense += amount * 0.01;
     }
 
     // Check for stronger player
