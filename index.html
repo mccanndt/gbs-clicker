@@ -2,22 +2,40 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>David McCann</title>
+    <title>GBS Clicker</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link href="https://fonts.googleapis.com/css?family=Muli%7CRoboto:400,300,500,700,900" rel="stylesheet">
     <script type="text/javascript" src="main.js"></script>
   </head>
-  <body>
-    <h1>Hello World</h1>
-    <p>I'm hosted with GitHub Pages.</p>
+  <body onload="onLoad();">
+    <h1>GBS Clicker</h1>
     <div id="healthProgress" class="w3-light-grey">
       <div id="healthBar" class="w3-container w3-green w3-center"></div>
     </div>
     <div>
-      <button onclick="loseHealth()">Lose Health</button>
-      <button onclick="gainHealth()">Gain Health</button>
-      <label id="healthLabel"></label>
+      <label id="currentLevel">Current Level: 0</label>
+    </div>
+    <div>
+      <button class="w3-btn w3-round-xlarge w3-border w3-border-red" onclick="levelChange(false)">Previous Level</button>
+      <button class="w3-btn w3-round-xlarge w3-border w3-border-blue" onclick="levelChange(true)">Next Level</button>
+    </div>
+    <div style="margin-top: 10px;">
+      <button class="w3-btn w3-round-xlarge w3-border w3-border-green" onclick="attack()">Attack</button>
+    </div>
+    <div class="container" style="margin-top: 10px;">
+      <div class="first">
+        <label id="healthRegen" class="player">Health Regen: 0/s</label>
+        <label id="playerAttack" class="player">Attack: 0</label>
+        <label id="playerDefense" class="player">Defense: 0</label>
+        <label id="deathCounter" class="player">Deaths: 0</label>
+      </div>
+      <div class="second">
+        <label id="enemyHealth" class="enemy">Enemy Health: 0</label>
+        <label id="enemyAttack" class="enemy">Enemy Attack: 0</label>
+        <label id="enemyDefense" class="enemy">Enemy Defense: 0</label>
+      </div>
+      <div id="clear"></div>
     </div>
   </body>
 </html>

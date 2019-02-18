@@ -9,3 +9,38 @@ body {
 }
 
 /* Section Styles */
+#healthProgress {
+  height: 65px;
+}
+
+#healthBar {
+  height: 65px;
+}
+
+.enemy {
+  display: block;
+}
+
+.player {
+  display: block;
+}
+
+.container {
+  width: 450px;
+  margin: auto;
+}
+
+.first {
+  width: 200px;
+  margin-right: 50px;
+  float: left;
+}
+
+.second {
+  width: 200px;
+  float: left;
+}
+
+.clear {
+  clear: both;
+}
