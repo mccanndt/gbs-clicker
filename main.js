@@ -1,15 +1,22 @@
-// Variables
-var maxLevel = 1;
-var currentLevel = 1;
+// Saved Variables
+var gameData = {
+  // Variables
+  maxLevel: 1,
+  currentLevel: 1,
 
-// Player variables
-var maxHealth = 100;
-var currentHealth = 100;
+  // Player variables
+  maxHealth: 100,
+  currentHealth: 100,
+  playerAttack: 1,
+  playerDefense: 0,
+  deathCounter: 0,
+};
+
+// Dynamic Variables
+var saveLabelFlag = false;
+var saveCounter = 0;
+
 var healthRegen;
-var playerAttack = 1;
-var playerDefense = 0;
-var deathCounter = 0;
-
 // Enemy variables
 var enemyCurrentHealth;
 var enemyMaxHealth;
@@ -17,6 +24,7 @@ var enemyAttack;
 var enemyDefense;
 
 function onLoad() {
+  loadGame();
   updateHealthRegen();
   enemySetUp();
   setInterval(oneSecondFunctions, 1000);
@@ -28,21 +36,21 @@ function onLoad() {
 function updateDisplay() {
   // Format numbers
   healthRegen = roundToTwoDecimals(healthRegen);
-  currentHealth = roundToTwoDecimals(currentHealth);
-  maxHealth = roundToTwoDecimals(maxHealth);
-  playerAttack = roundToTwoDecimals(playerAttack);
-  playerDefense = roundToTwoDecimals(playerDefense);
+  gameData.currentHealth = roundToTwoDecimals(gameData.currentHealth);
+  gameData.maxHealth = roundToTwoDecimals(gameData.maxHealth);
+  gameData.playerAttack = roundToTwoDecimals(gameData.playerAttack);
+  gameData.playerDefense = roundToTwoDecimals(gameData.playerDefense);
   enemyCurrentHealth = roundToTwoDecimals(enemyCurrentHealth);
 
   // Progress Bar
   var elem = document.getElementById("healthBar");
-  var width = (currentHealth/maxHealth) * 100;
+  var width = (gameData.currentHealth/gameData.maxHealth) * 100;
   elem.style.width = width + '%';
-  elem.innerHTML = currentHealth + " / " + maxHealth;
+  elem.innerHTML = gameData.currentHealth + " / " + gameData.maxHealth;
 
   // Level Label
   var elem = document.getElementById("currentLevel");
-  elem.innerHTML = "Current Level: " + currentLevel + " / " + maxLevel;
+  elem.innerHTML = "Current Level: " + gameData.currentLevel + " / " + gameData.maxLevel;
 
   // Health Regen Label
   var elem = document.getElementById("healthRegen");
@@ -50,15 +58,15 @@ function updateDisplay() {
 
   // Player Attack Label
   var elem = document.getElementById("playerAttack");
-  elem.innerHTML = "Attack: " + playerAttack;
+  elem.innerHTML = "Attack: " + gameData.playerAttack;
 
   // Player Defense Label
   var elem = document.getElementById("playerDefense");
-  elem.innerHTML = "Defense: " + playerDefense;
+  elem.innerHTML = "Defense: " + gameData.playerDefense;
 
   // Death Counter Label
   var elem = document.getElementById("deathCounter");
-  elem.innerHTML = "Deaths: " + deathCounter;
+  elem.innerHTML = "Deaths: " + gameData.deathCounter;
 
   // Enemy Health Label
   var elem = document.getElementById("enemyHealth");
@@ -75,41 +83,65 @@ function updateDisplay() {
 
 function oneSecondFunctions() {
   gainHealth();
+
+  if (saveLabelFlag) {
+    saveCounter += 1;
+    if (saveCounter == 5) {
+      var elem = document.getElementById("saveLabel");
+      elem.innerHTML = "";
+      saveLabelFlag = false;
+    }
+  }
+}
+
+function saveGame() {
+  localStorage.setItem("save", JSON.stringify(gameData));
+  var elem = document.getElementById("saveLabel");
+  elem.innerHTML = "Game Saved!";
+  saveLabelFlag = true;
+  saveCounter = 0;
+}
+
+function loadGame() {
+  var saveGame = JSON.parse(localStorage.getItem("save"));
+  if (saveGame !== null) {
+  gameData = saveGame
+  }
 }
 
 // Attack enemy. Lose health and gain health regen, defense, etc
 function attack() {
-  if (currentHealth > 0) {
+  if (gameData.currentHealth > 0) {
     // Check for a stronger enemy
-    if (enemyAttack > playerDefense) {
-      var amount = enemyAttack - playerDefense;
-      currentHealth -= amount;
-      playerDefense += enemyAttack * 0.01;
+    if (enemyAttack > gameData.playerDefense) {
+      var amount = enemyAttack - gameData.playerDefense;
+      gameData.currentHealth -= amount;
+      gameData.playerDefense += enemyAttack * 0.01;
     }
 
     // Check for stronger player
-    if (playerAttack > enemyDefense) {
-      var amount = playerAttack - enemyDefense;
+    if (gameData.playerAttack > enemyDefense) {
+      var amount = gameData.playerAttack - enemyDefense;
       enemyCurrentHealth -= amount;
-      playerAttack += 0.01 + enemyDefense * 0.01;
+      gameData.playerAttack += 0.01 + enemyDefense * 0.01;
     }
 
     // Enemy death
     if (enemyCurrentHealth <= 0) {
-      if (currentLevel == maxLevel) {
-        maxLevel += 1;
+      if (gameData.currentLevel == gameData.maxLevel) {
+        gameData.maxLevel += 1;
       }
       enemySetUp();
     }
 
     // Player death
-    if (currentHealth <= 0) {
-      currentHealth = 0;
-      maxHealth += playerAttack + playerDefense;
+    if (gameData.currentHealth <= 0) {
+      gameData.currentHealth = 0;
+      gameData.maxHealth += gameData.playerAttack + gameData.playerDefense;
       updateHealthRegen();
-      playerAttack = playerAttack / 2;
-      playerDefense = playerDefense / 2;
-      deathCounter += 1;
+      gameData.playerAttack = gameData.playerAttack / 2;
+      gameData.playerDefense = gameData.playerDefense / 2;
+      gameData.deathCounter += 1;
     }
   }
   updateDisplay();
@@ -117,10 +149,10 @@ function attack() {
 
 // Gain health
 function gainHealth() {
-  if (currentHealth < maxHealth) {
-    currentHealth += healthRegen;
-    if (currentHealth > maxHealth) {
-      currentHealth = maxHealth;
+  if (gameData.currentHealth < gameData.maxHealth) {
+    gameData.currentHealth += healthRegen;
+    if (gameData.currentHealth > gameData.maxHealth) {
+      gameData.currentHealth = gameData.maxHealth;
     }
   }
   updateDisplay();
@@ -128,11 +160,11 @@ function gainHealth() {
 
 // Change levels
 function levelChange(levelIncrease) {
-  if (levelIncrease && currentLevel != maxLevel) {
-    currentLevel += 1;
+  if (levelIncrease && gameData.currentLevel != gameData.maxLevel) {
+    gameData.currentLevel += 1;
   } else if (!levelIncrease) {
-    if (currentLevel != 1) {
-      currentLevel -= 1;
+    if (gameData.currentLevel != 1) {
+      gameData.currentLevel -= 1;
     }
   }
   enemySetUp();
@@ -140,14 +172,14 @@ function levelChange(levelIncrease) {
 }
 
 function enemySetUp() {
-  enemyMaxHealth = 9 + Math.pow(currentLevel, 4);
+  enemyMaxHealth = 9 + Math.pow(gameData.currentLevel, 4);
   enemyCurrentHealth = enemyMaxHealth;
-  enemyAttack = Math.pow(currentLevel, 2);
-  enemyDefense = Math.pow(currentLevel, 2) - 1;
+  enemyAttack = Math.pow(gameData.currentLevel, 2);
+  enemyDefense = Math.pow(gameData.currentLevel, 2) - 1;
 }
 
 function updateHealthRegen() {
-  healthRegen = maxHealth / 60;
+  healthRegen = gameData.maxHealth / 60;
 }
 
 // Math Functions
